@@ -26,16 +26,12 @@ gs_check_installed <- function(pkg,
 
     if (isTRUE(strict)) {
       # We need this package but maybe we can prompt the user to install it.
-      if (!is.null(sys.calls())) {
-        caller_fn_name <- deparse(sys.call(-1L))
-        message <- sprintf("Calling `%s` requires %s.", caller_fn_name, pkg)
-      } else {
-        message <- sprintf("%s is required.", pkg)
-      }
+      message <- .create_message(pkg)
+
       answer <- 0 # set default in case it isn't an interactive session
       if (isTRUE(prompt)) {
         title <- sprintf("%s\n\nDo you want to install it?", message)
-        answer <- utils::menu(c("Yes", "No"), title)
+        answer <- utils::menu(c("Yes", "No"), title = title)
       }
       # no install is an error
       if (answer != 1) stop(message)
@@ -47,4 +43,19 @@ gs_check_installed <- function(pkg,
     return(FALSE)
   }
   return(TRUE)
+}
+
+
+.create_message <- function(pkg) {
+  # Since this is called within a function that is called within another
+  # function, sys.nframe() will return 2 if `gs_check_installed` is called in
+  # the global environment
+  if (sys.nframe() > 2) {
+    # gs_check_installed is being called within another function
+    caller <- deparse(sys.call(-2L))
+    sprintf("Calling `%s` requires %s package.", caller, pkg)
+  } else {
+    # Must've been called in a global context
+    sprintf("%s is required.", pkg)
+  }
 }
