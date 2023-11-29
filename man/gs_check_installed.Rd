@@ -4,7 +4,7 @@
 \alias{gs_check_installed}
 \title{Check whether a package is installed.}
 \usage{
-gs_check_installed(pkg, strict = TRUE, prompt = interactive(), ...)
+gs_check_installed(pkg, strict = TRUE, prompt = base::interactive(), ...)
 }
 \arguments{
 \item{pkg}{A character vector naming the package(s), whose installation

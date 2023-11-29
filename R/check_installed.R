@@ -15,11 +15,11 @@
 #' @export
 gs_check_installed <- function(pkg,
                                strict = TRUE,
-                               prompt = interactive(),
+                               prompt = base::interactive(),
                                ...) {
   checkmate::qassert(pkg, "S1")
   # https://stackoverflow.com/a/62809204
-  is_installed <- !identical(find.package(pkg, quiet = TRUE), character(0))
+  is_installed <- !base::identical(base::find.package(pkg, quiet = TRUE), character(0))
 
   if (isFALSE(is_installed)) {
     # The package isn't installed, but does anything need to happen?
@@ -30,12 +30,12 @@ gs_check_installed <- function(pkg,
 
       answer <- 0 # set default in case it isn't an interactive session
       if (isTRUE(prompt)) {
-        title <- sprintf("%s\n\nDo you want to install it?", message)
+        title <- base::sprintf("%s\n\nDo you want to install it?", message)
         answer <- utils::menu(c("Yes", "No"), title = title)
       }
       # no install is an error
-      if (answer != 1) stop(message)
-      install.packages(pkg)
+      if (answer != 1) base::stop(message)
+      gs_install(pkg)
       return(TRUE)
     }
 
@@ -50,12 +50,12 @@ gs_check_installed <- function(pkg,
   # Since this is called within a function that is called within another
   # function, sys.nframe() will return 2 if `gs_check_installed` is called in
   # the global environment
-  if (sys.nframe() > 2) {
+  if (base::sys.nframe() > 2L) {
     # gs_check_installed is being called within another function
-    caller <- deparse(sys.call(-2L))
-    sprintf("Calling `%s` requires %s package.", caller, pkg)
+    caller <- base::deparse(base::sys.call(-2L))
+    base::sprintf("Calling `%s` requires %s package.", caller, pkg)
   } else {
     # Must've been called in a global context
-    sprintf("%s is required.", pkg)
+    base::sprintf("%s is required.", pkg)
   }
 }
